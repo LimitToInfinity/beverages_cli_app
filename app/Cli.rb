@@ -1,23 +1,36 @@
 class Cli
 
+  attr_reader :prompt, :username, :beverage_choice
+
+  def initialize
+    @username = ''
+    @beverage_choice = ''
+    @prompt = TTY::Prompt.new(symbols: { marker: '😂' })
+  end
+
   def welcome
     puts 'Hello, welcome to my app!'
   end
 
   def ask_users_name
-    users_name = gets.strip
-    puts "Good day, #{users_name}"
+    @username = prompt.ask('What is your name?', default: 'guest')
+    puts "Good day, #{username}"
   end
 
-  def display_each_beverage_name
-    Beverage.all_beverage_names.each do |beverage_name|
-      puts beverage_name
-    end
+  def display_beverage beverage
+    puts 'Here is your beverage'
+    puts "name #{beverage.name}"
+    puts "strength #{beverage.strength}"
   end
 
   def show_beverages
-    puts 'Here are our existing beverages'
-    display_each_beverage_name
+    @beverage_choice = prompt.select(
+      'Choose your favorite drink?',
+      Beverage.all.pluck(:name),
+      filter: true
+    )
+    chosen_beverage = Beverage.find_by name: beverage_choice
+    display_beverage chosen_beverage
   end
 
 end
